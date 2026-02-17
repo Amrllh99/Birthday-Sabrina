@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Notebook</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+<style>
+html, body {height:100%; margin:0; padding:0; font-family:'Patrick Hand', cursive; background:#FDF6E3; color:#4A3728;}
+.notebook-wrapper {min-height:100%; overflow-x:hidden; padding:2rem 1rem 4rem; background: linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), #FDF6E3; background-size:100% 24px; background-repeat:repeat-y;}
+.handwritten-title { font-family:'Caveat', cursive; }
+.handwritten-text { font-family:'Patrick Hand', cursive; font-size:1rem; line-height:1.5; }
+.photo-frame { background:#FFF; padding:8px 8px 16px; box-shadow:0 4px 6px rgba(0,0,0,0.1),0 2px 4px rgba(0,0,0,0.06); border-radius:8px; margin-bottom:0.5rem; }
+.placeholder-img { background:linear-gradient(135deg, #7BA3E8 0%, #E87B7B 100%); display:flex; align-items:center; justify-content:center; color:white; font-size:14px; text-align:center; width:100%; height:100%; border-radius:6px; }
+.photo-reveal { opacity:0; transform: scale(0.8); transition: all 0.6s cubic-bezier(0.34,1.56,0.64,1); margin-bottom:0.5rem;}
+.photo-reveal.visible { opacity:1; transform: scale(1) rotate(var(--rotation,0deg)) translateX(var(--scatter,0px)); }
+.section-reveal { opacity:0; transform: translateY(20px); transition: all 0.6s cubic-bezier(0.4,0,0.2,1); width:100%; max-width:720px; margin:0 auto; margin-bottom:0.5rem; }
+.text-line { display:block; opacity:0; transform:translateX(0); transition:all 0.5s ease-out; margin-bottom:0.5rem; }
+.text-line.visible { opacity:1; transform:translateX(0); }
+.replay-btn { background:#E87B7B; color:white; transition: all 0.3s ease; font-family:'Caveat', cursive; }
+.replay-btn:hover { transform: scale(1.05); }
+#final-heart-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; z-index:998; }
+#final-heart { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0); font-size:64px; color:#E87B7B; text-align:center; pointer-events:none; z-index:999; transition: transform 1s ease; }
+#final-heart.show { transform:translate(-50%,-50%) scale(1); }
+#final-heart span { display:block; font-size:28px; color:white; font-family:'Patrick Hand', cursive; margin-top:-1em; }
+</style>
+</head>
+<body>
+<div class="notebook-wrapper" id="notebook">
+
+<section class="flex flex-col items-center justify-center px-6 py-4 relative section-reveal">
+  <h1 class="handwritten-title text-4xl md:text-6xl mb-2" id="intro-title">INSERT_TITLE_HERE</h1>
+  <p class="handwritten-text text-xl opacity-80 mb-2" id="intro-subtitle">INSERT_SUBTITLE_HERE</p>
+  <div class="photo-reveal" style="--rotation:0deg; --scatter:0px;">
+    <div class="photo-frame w-64 h-64 md:w-80 md:h-80">
+      <div class="placeholder-img">Insert your GDrive link</div>
+    </div>
+    <div class="handwritten-text mt-2 text-line">Hey baby, happy 27th birthday. You’re getting older already yeah, but your heart still remains young and pure, and that’s something I will forever cherish deeply.</div>
+  </div>
+</section>
+
+<!-- Dynamic Paragraph + Photos -->
+<div id="sections-container"></div>
+
+<!-- Final Heart Section -->
+<section class="flex flex-col items-center justify-center px-6 py-4 relative section-reveal">
+  <div class="photo-reveal mb-4" style="--rotation: 2deg; --scatter: 0px;">
+    <div class="photo-frame w-72 h-72 md:w-96 md:h-96">
+      <div class="placeholder-img">Insert your GDrive link</div>
+    </div>
+  </div>
+  <div class="handwritten-text mt-2">
+    <p class="text-line">I’m sorry I couldn’t give your present yet because of delivery timing, but you will get it soon, fret not baby.</p>
+  </div>
+  <button class="replay-btn mt-4 px-8 py-3 rounded-full handwritten-text text-xl" id="final-button">
+    ♥ Celebrate Baby ♥
+  </button>
+</section>
+</div>
+
+<div id="final-heart-overlay"></div>
+<div id="final-heart">
+  ♥
+  <span>27th year strong baby girl</span>
+</div>
+
+<script>
+// Birthday paragraphs
+const messageBlocks = [
+`The smartest in whatever you do. The easiest to laugh at my jokes (but also the biggest killjoy sometimes just to stop me from exaggerating myself). The striking fancy outfits, the cute quirky face, the constant yapping and nagging whenever I make mistakes, and lastly, the prettiest smile that has been affectionating me all this while. There’s honestly so much more, but you gotta ask me from time to time. Perks of having short-term memory loss is that I recall different details about you at different moments. It just sways in my mind, but it will always be there at the right time, hehehe.`,
+`I will always remember the first time we started knowing each other. I was an introverted dick (I hope I’m not still now hehe). Little did I know, it would become the greatest gift I could have ever asked for in my life. You’ve seen me in my ups and downs all this while, yet you still appreciate my presence and accept my place in every decision we’ve made together. That means more to me than I can explain.`,
+`They say behind strength is consistency, and you are the most hardworking girl I’ve ever met. Your attention to detail, your respect for others, the way you show up as the best friend anyone could ask for, and the best partner I could ever receive. I thank Allah for introducing me to you. I still remember when you used to advise me to sleep early, and now I actually sleep early hehe. But now it became vice versa because my influence on you is too strong kot. BTW, on your special day today, I admit that all my claims of performing better than you is officially a fraud… but only today aite.`,
+`I just hope you don’t cry too much, because it pains me to see you that way. I promise I will continue working hard to make this work, and to do things right with you. Walaupun I naughty dengan baby sometimes hehehe. But BE STRONG BBY SBB I TAK STRONG.`,
+`This will be the first and last birthday we celebrate before we enter our marriage, and I want you to know you are the best decision I have ever made. I never regret loving you. Even though sometimes you ask me for justification, for a clear definition of why, I still can’t fully put it into words. It’s like asking why I love the things I love instead of what others love. The simplest way I can say it is… I just resonate with you. Or in the perfect definition, sekufu, baby hehe. I can’t wait to go through marriage planning again with you, baby.`,
+`I hope you enjoy this small, last-minute birthday plan I prepared for you. And once again, happy 27th birthday to my lover, Sabrina Hannah.`
+];
+
+const container = document.getElementById('sections-container');
+messageBlocks.forEach(block=>{
+  const rotation=(Math.random()*12-6).toFixed(1);
+  const scatter=(Math.random()*40-20).toFixed(1);
+  const section=document.createElement('section');
+  section.className='px-6 py-4 flex flex-col items-center relative section-reveal';
+  section.innerHTML=`
+    <div class="photo-reveal relative" style="--rotation:${rotation}deg; --scatter:${scatter}px;">
+      <div class="photo-frame w-64 h-64 md:w-72 md:h-72">
+        <div class="placeholder-img">Insert your GDrive link</div>
+      </div>
+    </div>
+    <div class="handwritten-text mt-2">
+      <p class="text-line">${block}</p>
+    </div>
+  `;
+  container.appendChild(section);
+});
+
+// Reveal effect after DOM load
+window.addEventListener('load',()=>{
+  document.querySelectorAll('.section-reveal, .photo-reveal, .text-line').forEach(el=>{
+    el.classList.add('visible');
+  });
+});
+
+// Final heart button
+const finalButton=document.getElementById('final-button');
+const finalHeart=document.getElementById('final-heart');
+const overlay=document.getElementById('final-heart-overlay');
+let heartShown=false;
+
+finalButton.addEventListener('click',()=>{
+  if(!heartShown){
+    overlay.style.display='block';
+    finalHeart.classList.add('show');
+    heartShown=true;
+  } else {
+    overlay.style.display='none';
+    window.scrollTo({top:0, behavior:'smooth'});
+    location.reload();
+  }
+});
+</script>
+</body>
+</html>
